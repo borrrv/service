@@ -5,6 +5,7 @@ from recipes.views import TagViewSet
 
 router = DefaultRouter()
 
+
 router.register(r'tags', TagViewSet)
 
 urlpatterns = [
