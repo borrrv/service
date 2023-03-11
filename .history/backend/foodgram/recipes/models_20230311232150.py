@@ -8,21 +8,19 @@ class Tag(models.Model):
         unique=True,
         blank=False,
         help_text='Введи тег',
-        max_length=200,
+        max_length=20,
     )
     color = models.CharField(
-        max_length=7,
+        max_length=16,
         validators=[RegexValidator(r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")],
     )
     slug = models.SlugField(
         unique=True,
         blank=False,
-        max_length=200,
     )
 
     def __str__(self):
         return self.name_tag
-
 
 
 class Ingridient(models.Model):
@@ -33,7 +31,6 @@ class Ingridient(models.Model):
     )
     amount = models.FloatField(
         blank=False,
-        null=True,
         help_text='Введите количество',
     )
     unit = models.CharField(
@@ -78,7 +75,7 @@ class Recipe(models.Model):
         blank=False,
         help_text='Выберите теги'
     )
-    cooking_time = models.IntegerField(
+    cooking_time = models.DateTimeField(
         blank=False,
         help_text='Выберите время приготовления',
     )

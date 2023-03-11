@@ -27,7 +27,7 @@ class RecipesSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=False, allow_null=True)
 
     class Meta:
-        model = Recipe
+        model = IngridientReciepe
         fields = (
             'ingridients',
             'tags',

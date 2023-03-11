@@ -47,3 +47,5 @@ class IngridientSerializer(serializers.ModelSerializer):
             'name_ingridient',
             'unit',
         )
+        extra_kwargs = {'name_ingridient': {'required': False},
+                        'unit': {'required': False}}

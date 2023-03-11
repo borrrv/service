@@ -13,18 +13,17 @@ class Base64ImageField(serializers.ImageField):
         return super().to_internal_value(data)
 
 class TagSerializers(serializers.ModelSerializer):
+    image = Base64ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Tag
         fields = (
-            'id',
-            'name_tag',
-            'color',
-            'slug',
-        )
+                  'name_tag',
+                  'color',
+                  'slug',
+                )
 
 class RecipesSerializer(serializers.ModelSerializer):
-    image = Base64ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Recipe
@@ -35,15 +34,4 @@ class RecipesSerializer(serializers.ModelSerializer):
             'name',
             'text',
             'cooking_time'
-        )
-
-
-class IngridientSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Ingridient
-        fields = (
-            'id',
-            'name_ingridient',
-            'unit',
         )

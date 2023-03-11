@@ -78,7 +78,7 @@ class Recipe(models.Model):
         blank=False,
         help_text='Выберите теги'
     )
-    cooking_time = models.IntegerField(
+    cooking_time = models.DateTimeField(
         blank=False,
         help_text='Выберите время приготовления',
     )

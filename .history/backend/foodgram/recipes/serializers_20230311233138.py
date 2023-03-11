@@ -17,11 +17,11 @@ class TagSerializers(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = (
-            'id',
-            'name_tag',
-            'color',
-            'slug',
-        )
+                'name_tag',
+                'color',
+                'slug',
+                'id',
+            )
 
 class RecipesSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=False, allow_null=True)
@@ -35,15 +35,4 @@ class RecipesSerializer(serializers.ModelSerializer):
             'name',
             'text',
             'cooking_time'
-        )
-
-
-class IngridientSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Ingridient
-        fields = (
-            'id',
-            'name_ingridient',
-            'unit',
         )

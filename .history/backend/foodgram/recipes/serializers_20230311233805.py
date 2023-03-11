@@ -42,8 +42,8 @@ class IngridientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ingridient
-        fields = (
+        fields = {
             'id',
             'name_ingridient',
             'unit',
-        )
+        }

@@ -20,4 +20,3 @@ class RecipesViewSet(viewsets.ModelViewSet):
 class IngridientViewSet(viewsets.ModelViewSet):
     queryset = Ingridient.objects.all()
     serializer_class = IngridientSerializer
-    pagination_class = None

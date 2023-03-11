@@ -36,14 +36,3 @@ class RecipesSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time'
         )
-
-
-class IngridientSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Ingridient
-        fields = (
-            'id',
-            'name_ingridient',
-            'unit',
-        )

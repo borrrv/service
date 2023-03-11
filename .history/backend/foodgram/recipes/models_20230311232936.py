@@ -22,7 +22,9 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name_tag
-
+    
+    class Meta:
+        ordering = ('id,')
 
 
 class Ingridient(models.Model):
@@ -33,7 +35,6 @@ class Ingridient(models.Model):
     )
     amount = models.FloatField(
         blank=False,
-        null=True,
         help_text='Введите количество',
     )
     unit = models.CharField(
@@ -78,7 +79,7 @@ class Recipe(models.Model):
         blank=False,
         help_text='Выберите теги'
     )
-    cooking_time = models.IntegerField(
+    cooking_time = models.DateTimeField(
         blank=False,
         help_text='Выберите время приготовления',
     )
