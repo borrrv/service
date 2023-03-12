@@ -26,7 +26,7 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    name = models.CharField(
+    name_ingridient = models.CharField(
         blank=False,
         max_length=50,
         help_text='Укажите название ингридиента',
@@ -43,7 +43,7 @@ class Ingredient(models.Model):
     )
 
     def __str__(self):
-        return f'{self.name}, {self.unit}'
+        return f'{self.name_ingridient}, {self.unit}'
 
 
 class Recipe(models.Model):
@@ -68,8 +68,8 @@ class Recipe(models.Model):
         help_text='Придумайте описание',
         max_length=100,
     )
-    ingredients = models.ManyToManyField(
-        Ingredient,
+    ingridients = models.ManyToManyField(
+        Ingridient,
         blank=False,
         help_text='Выберите ингридиенты',
     )
@@ -83,13 +83,10 @@ class Recipe(models.Model):
         help_text='Выберите время приготовления',
     )
 
-    def __str__(self):
-        return self.name
 
-
-class IngredientReciepe(models.Model):
-    ingredients = models.ForeignKey(
-        Ingredient,
+class IngridientReciepe(models.Model):
+    ingridients = models.ForeignKey(
+        Ingridient,
         on_delete=models.CASCADE,
     )
     reciepes = models.ForeignKey(
@@ -101,4 +98,4 @@ class IngredientReciepe(models.Model):
     )
 
     def __str__(self):
-        return f'{self.ingredients}, {self.value}'
+        return f'{self.ingridients}, {self.value}'

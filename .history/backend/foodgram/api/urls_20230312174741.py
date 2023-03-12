@@ -7,7 +7,7 @@ router = DefaultRouter()
 
 router.register(r'tags', TagViewSet)
 router.register(r'recipes', RecipesViewSet)
-router.register(r'ingredients', IngredientViewSet)
+router.register(r'ingridients', IngredientViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),

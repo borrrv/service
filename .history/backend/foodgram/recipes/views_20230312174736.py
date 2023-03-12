@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from .models import Tag, Recipe, Ingredient
+from .models import Tag, Recipe, Ingridient
 from rest_framework.decorators import action
-from .serializers import TagSerializers, IngredientSerializer, RecipesSerializer
+from .serializers import TagSerializers, IngridientSerializer, RecipesSerializer
 from rest_framework.response import Response
 from rest_framework import viewsets
 
@@ -23,6 +23,6 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
-    queryset = Ingredient.objects.all()
-    serializer_class = IngredientSerializer
+    queryset = Ingridient.objects.all()
+    serializer_class = IngridientSerializer
     pagination_class = None

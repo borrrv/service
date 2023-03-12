@@ -43,14 +43,13 @@ class IngredientGetSerializer(serializers.ModelSerializer):
         queryset=Ingredient.objects.all(),
     )
     amount = serializers.IntegerField()
-    author = UserCreateSerializer(read_only=True)
+    author = UserCreateSerializer
 
     class Meta:
         model = Ingredient
         fields = (
             'id',
             'amount',
-            'author',
         )
 
 class RecipesSerializer(serializers.ModelSerializer):
@@ -61,7 +60,6 @@ class RecipesSerializer(serializers.ModelSerializer):
     )
     image = Base64ImageField(required=False, allow_null=True)
     ingredients = IngredientGetSerializer(many=True)
-    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Recipe

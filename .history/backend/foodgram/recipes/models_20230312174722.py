@@ -26,7 +26,7 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    name = models.CharField(
+    name_ingredient = models.CharField(
         blank=False,
         max_length=50,
         help_text='Укажите название ингридиента',
@@ -43,7 +43,7 @@ class Ingredient(models.Model):
     )
 
     def __str__(self):
-        return f'{self.name}, {self.unit}'
+        return f'{self.name_ingredient}, {self.unit}'
 
 
 class Recipe(models.Model):
@@ -82,9 +82,6 @@ class Recipe(models.Model):
         blank=False,
         help_text='Выберите время приготовления',
     )
-
-    def __str__(self):
-        return self.name
 
 
 class IngredientReciepe(models.Model):

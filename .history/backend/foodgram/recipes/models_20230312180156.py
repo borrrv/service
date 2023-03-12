@@ -83,9 +83,6 @@ class Recipe(models.Model):
         help_text='Выберите время приготовления',
     )
 
-    def __str__(self):
-        return self.name
-
 
 class IngredientReciepe(models.Model):
     ingredients = models.ForeignKey(

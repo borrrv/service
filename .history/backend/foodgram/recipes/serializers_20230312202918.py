@@ -2,7 +2,6 @@ from .models import Recipe, Ingredient, Tag, IngredientReciepe
 from rest_framework import serializers
 import base64
 from django.core.files.base import ContentFile
-from users.serializers import UserCreateSerializer
 
 
 class Base64ImageField(serializers.ImageField):
@@ -33,24 +32,17 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
-            'amount',
             'unit',
         )
 
 
 class IngredientGetSerializer(serializers.ModelSerializer):
-    id = serializers.PrimaryKeyRelatedField(
-        queryset=Ingredient.objects.all(),
-    )
-    amount = serializers.IntegerField()
-    author = UserCreateSerializer(read_only=True)
 
     class Meta:
         model = Ingredient
         fields = (
             'id',
             'amount',
-            'author',
         )
 
 class RecipesSerializer(serializers.ModelSerializer):
@@ -60,14 +52,11 @@ class RecipesSerializer(serializers.ModelSerializer):
         queryset=Tag.objects.all(), many=True,
     )
     image = Base64ImageField(required=False, allow_null=True)
-    ingredients = IngredientGetSerializer(many=True)
-    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    ingredients = IngredientSerializer(many=True)
 
     class Meta:
         model = Recipe
         fields = (
-            'id',
-            'author',
             'ingredients',
             'tags',
             'image',
@@ -79,21 +68,23 @@ class RecipesSerializer(serializers.ModelSerializer):
 
     def create_ingredients(self, ingredients, recipe):
         for ingredient in ingredients:
-            ingredient_obj = ingredient['id']
-            amount = ingredient['amount']
+            ingredient_obj = Ingredient.objects.get(id=ingredient['ingredient']['id'])  # Исправлено
             IngredientReciepe.objects.create(
                 recipe=recipe, ingredient=ingredient_obj,
-                amount=amount,
+                amount=ingredient['amount']
             )
 
     def create(self, validated_data):
         author = self.context.get('request').user
         tags_data = validated_data.pop('tags')
         ingredients_data = validated_data.pop('ingredients')
+        image = validated_data.pop('image')
         recipes = Recipe.objects.create(
-            author=author, **validated_data
+            image=image, **validated_data
         )
         self.create_ingredients(ingredients_data, recipes)
         recipes.tags.set(tags_data)
         return recipes
+
+
 

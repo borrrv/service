@@ -2,7 +2,6 @@ from .models import Recipe, Ingredient, Tag, IngredientReciepe
 from rest_framework import serializers
 import base64
 from django.core.files.base import ContentFile
-from users.serializers import UserCreateSerializer
 
 
 class Base64ImageField(serializers.ImageField):
@@ -41,16 +40,14 @@ class IngredientSerializer(serializers.ModelSerializer):
 class IngredientGetSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all(),
+        source='ingredient',
     )
-    amount = serializers.IntegerField()
-    author = UserCreateSerializer(read_only=True)
 
     class Meta:
         model = Ingredient
         fields = (
             'id',
             'amount',
-            'author',
         )
 
 class RecipesSerializer(serializers.ModelSerializer):
@@ -61,13 +58,11 @@ class RecipesSerializer(serializers.ModelSerializer):
     )
     image = Base64ImageField(required=False, allow_null=True)
     ingredients = IngredientGetSerializer(many=True)
-    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Recipe
         fields = (
             'id',
-            'author',
             'ingredients',
             'tags',
             'image',
@@ -86,14 +81,30 @@ class RecipesSerializer(serializers.ModelSerializer):
                 amount=amount,
             )
 
+    # def create(self, validated_data):
+    #     author = self.context.get('request').user
+    #     tags_data = validated_data.pop('tags')
+    #     ingredients_data = validated_data.pop('ingredients')
+    #     image = validated_data.pop('image')
+    #     recipes = Recipe.objects.create(
+    #         image=image, **validated_data
+    #     )
+    #     self.create_ingredients(ingredients_data, recipes)
+    #     recipes.tags.set(tags_data)
+    #     return recipes
     def create(self, validated_data):
-        author = self.context.get('request').user
-        tags_data = validated_data.pop('tags')
         ingredients_data = validated_data.pop('ingredients')
-        recipes = Recipe.objects.create(
-            author=author, **validated_data
-        )
-        self.create_ingredients(ingredients_data, recipes)
-        recipes.tags.set(tags_data)
-        return recipes
+        tags_data = validated_data.pop('tags')
+        recipe = Recipe.objects.create(**validated_data)
+        for ingredient_data in ingredients_data:
+            ingredient = Ingredient.objects.create(**ingredient_data)
+            amount = ingredient_data['amount']
+            unit = ingredient_data['unit']
+            IngredientReciepe.objects.create(
+                ingredient=ingredient, recipe=recipe, amount=amount, unit=unit)
+        for tag_data in tags_data:
+            tag, _ = Tag.objects.get_or_create(name_tag=tag_data['name_tag'], slug=tag_data['slug'], color=tag_data['color'])
+            recipe.tags.add(tag)
+        return recipe
+
 
