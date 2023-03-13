@@ -32,24 +32,4 @@ class UserGetSerializer(UserSerializer):
 
 class FollowSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField(read_only=True)
-    recipes = serializers.SerializerMethodField(read_only=True)
-    recipes_count = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = User
-        fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'is_subscribed',
-            'recipes',
-            'recipes_count',
-        )
-    def is_subcribed(self, obj):
-        user = self.context.get('request'.user)
-        if not user:
-            return False
-        return Follow.objects.filter(user=user, author=obj).exists()
-    
+    recipes = 

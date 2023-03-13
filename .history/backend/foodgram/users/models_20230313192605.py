@@ -43,51 +43,9 @@ class User(AbstractUser):
         'Подписка',
         default=False,
     )
-    role = models.CharField(
-        choices=ROLES,
-        default=GUEST,
-        max_length=10,
-    )
-
-    @property
-    def is_guest(self):
-        return self.role == self.GUEST
-    
-    @property
-    def is_user(self):
-        return self.role == self.USER
-    
-    @property
-    def is_admin(self):
-        return self.is_superuser or self.role == self.ADMIN
-
     class Meta:
         verbose_name = 'Пользователь'
         ordering = ('id',)
 
     def __str__(self):
         return f'{self.username}, {self.email}'
-
-
-class Follow(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='follower',
-    )
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='following',
-    )
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'author'],
-                name='unique_user_and_author'
-            )
-        ]
-
-    def __str__(self):
-        return f'{self.user} : {self.author}'

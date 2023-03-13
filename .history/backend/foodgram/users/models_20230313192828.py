@@ -59,7 +59,7 @@ class User(AbstractUser):
     
     @property
     def is_admin(self):
-        return self.is_superuser or self.role == self.ADMIN
+        return self.role == self.ADMIN
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -67,27 +67,3 @@ class User(AbstractUser):
 
     def __str__(self):
         return f'{self.username}, {self.email}'
-
-
-class Follow(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='follower',
-    )
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='following',
-    )
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'author'],
-                name='unique_user_and_author'
-            )
-        ]
-
-    def __str__(self):
-        return f'{self.user} : {self.author}'
