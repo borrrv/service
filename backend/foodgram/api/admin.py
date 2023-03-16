@@ -51,11 +51,11 @@ class FavoritesAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'user',
-        'recipes',
+        'recipe',
     )
     search_fields = (
         'user',
-        'recipes',
+        'recipe',
     )
     empty_value_display = '-пусто-'
 
@@ -63,11 +63,11 @@ class FavoritesAdmin(admin.ModelAdmin):
 class ShoppingCartAdmin(admin.ModelAdmin):
     list_display = (
         'user',
-        'recipes',
+        'recipe',
     )
     search_fields = (
         'user',
-        'recipes',
+        'recipe',
     )
 
 admin.site.register(Ingredient, IngridientAdmin)

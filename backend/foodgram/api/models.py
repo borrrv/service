@@ -1,6 +1,6 @@
+from django.core.validators import RegexValidator
 from django.db import models
 from users.models import User
-from django.core.validators import RegexValidator
 
 
 class Tag(models.Model):
@@ -78,13 +78,15 @@ class Recipe(models.Model):
         blank=False,
         help_text='Выберите ингредиенты',
         verbose_name='Список ингредиентов',
-        related_name='ingrdedient',
+        related_name='recipe',
+        through='IngredientReciepe',
     )
     tags = models.ManyToManyField(
         Tag,
         blank=False,
         help_text='Выберите теги',
         verbose_name='Список тегов',
+        related_name='recipes',
     )
     cooking_time = models.PositiveIntegerField(
         blank=False,
@@ -104,28 +106,33 @@ class Recipe(models.Model):
 
 
 class IngredientReciepe(models.Model):
-    ingredients = models.ForeignKey(
+    ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
         verbose_name='Ингредиент',
-        related_name='ingredients',
     )
-    recipes = models.ForeignKey(
+    recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         verbose_name='Рецепт',
-        related_name='recipes',
+        related_name='recipe_ingredient',
     )
     amount = models.PositiveIntegerField(
         help_text='Введите количество продукта',
         verbose_name='Количество',
     )
 
-    class Meta:
-        verbose_name='Ингредиенты в рецептах'
 
+    class Meta:
+        verbose_name = 'Ингредиенты в рецептах'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('recipe', 'ingredient'),
+                name='unique_ingredient_for_recipe'
+            )
+        ]
     def __str__(self):
-        return f'{self.ingredients}, {self.amount}'
+        return f'{self.ingredient}, {self.amount}'
     
 
 
@@ -134,22 +141,24 @@ class Favorites(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name='Пользователь',
+        related_name='favorite',
     )
-    recipes = models.ForeignKey(
+    recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         verbose_name='Рецепт',
+        related_name='favorite',
     )
 
     class Meta:
         verbose_name = 'Избранные'
         ordering = ('id',)
-        constraints = [
+        constraints = (
             models.UniqueConstraint(
-                fields=('user', 'recipes',),
+                fields=('user', 'recipe',),
                 name='unique_favorite',
-            )
-        ]
+            ),
+        )
 
 
 class ShoppingCart(models.Model):
@@ -159,13 +168,20 @@ class ShoppingCart(models.Model):
         verbose_name='Пользователь',
         related_name='shopping_cart',
     )
-    recipes = models.ForeignKey(
-        User,
+    recipe = models.ForeignKey(
+        Recipe,
         on_delete=models.CASCADE,
         verbose_name='Рецепт',
-        related_name='shopping_car',
+        related_name='shopping_cart',
     )
 
     class Meta:
         ordering = ('id',)
         verbose_name='Покупки'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('user', 'recipe',),
+                name='unique_recipe_in_shoppingcart'
+            ),
+        )
+        
