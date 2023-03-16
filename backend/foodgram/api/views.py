@@ -79,6 +79,13 @@ class RecipesViewSet(viewsets.ModelViewSet):
             content = {'errors': 'Этого рецепта нет в списке покупок'}
             return Response(content, status=HTTP_400_BAD_REQUEST)
 
+    @action(detail=True, methods=['GET'])
+    def download_shopping_cart(self, request, pk=None):
+        content = 'dsadsadasd'
+        response = HttpResponse(content, content_type='text/plain')
+        response['Content-Disposition'] = "attachment; filename='shopping_list.txt'"
+        return response
+
 
 class IngredientViewSet(viewsets.ModelViewSet):
     """Вьюсет для ингредиентов"""
