@@ -27,7 +27,6 @@ class Tag(models.Model):
         return self.name
 
 
-
 class Ingredient(models.Model):
     name = models.CharField(
         blank=False,
@@ -100,6 +99,7 @@ class Recipe(models.Model):
 
     class Meta:
         verbose_name='Рецепты'
+        ordering = ['-pub_date']
 
     def __str__(self):
         return self.name
@@ -131,10 +131,10 @@ class IngredientReciepe(models.Model):
                 name='unique_ingredient_for_recipe'
             )
         ]
+
     def __str__(self):
         return f'{self.ingredient}, {self.amount}'
     
-
 
 class Favorites(models.Model):
     user = models.ForeignKey(

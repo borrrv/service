@@ -1,12 +1,13 @@
-from .models import User, Follow
-from rest_framework.decorators import action, permission_classes
-from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
-from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED, HTTP_204_NO_CONTENT
-from .serializers import UserGetSerializer, FollowSerializer
-from rest_framework import permissions
 from djoser.views import UserViewSet
+from rest_framework import permissions
+from rest_framework.decorators import action, permission_classes
+from rest_framework.response import Response
+from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
+                                   HTTP_400_BAD_REQUEST)
+
+from .models import Follow, User
+from .serializers import FollowSerializer, UserGetSerializer
 
 
 class UserViewSet(UserViewSet):
@@ -51,4 +52,3 @@ class UserViewSet(UserViewSet):
             page, many=True,
             context={'request': request})
         return self.get_paginated_response(serializer.data)
-

@@ -1,22 +1,30 @@
 from api.models import (Favorites, Ingredient, IngredientReciepe, Recipe,
                         ShoppingCart, Tag)
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_400_BAD_REQUEST)
-from django.http import FileResponse, HttpResponse
 
+from .permissions import IsAuthorOrReadOnly
 from .serializers import (AddRecipesSerializer, FavoriteSerializer,
-                          IngredientRecipeSerializer, IngredientSerializer,
-                          RecipesSerializer, TagSerializer, ShoppingCartSerializer)
-from users.models import User
+                          IngredientSerializer, ShoppingCartSerializer,
+                          TagSerializer)
+
 
 class TagViewSet(viewsets.ModelViewSet):
+    """Вьюсет для тега"""
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
+    filter_backends = [SearchFilter]
+    search_fields = ['recipes__name']
+    permission_classes = (AllowAny,)
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
@@ -24,7 +32,14 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
     queryset = Recipe.objects.all()
     serializer_class = AddRecipesSerializer
+    permission_classes = (IsAuthorOrReadOnly,)
+    filter_backends = [SearchFilter]
+    search_fields = ['author', 'tags', 'favorite__recipe', 'shopping_cart__recipe']
 
+    def get_permissions(self):
+        if self.request.method in ['POST, DELETE, PATCH']:
+            self.permission_classes = [IsAuthenticated]
+        return super(RecipesViewSet, self).get_permissions()
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
     
@@ -45,8 +60,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             serializer = FavoriteSerializer(data={'user': user.id, 'recipe': recipe.id})
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            content = {'messaage': 'Рецепт успешно добавлен в избранное'}
-            return Response(content, status=HTTP_201_CREATED)
+            return Response(serializer.data, status=HTTP_201_CREATED)
         
         if request.method == 'DELETE':
             if favorite.exists():
@@ -79,16 +93,31 @@ class RecipesViewSet(viewsets.ModelViewSet):
             content = {'errors': 'Этого рецепта нет в списке покупок'}
             return Response(content, status=HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['GET'])
+    @action(detail=False, methods=['GET'])
     def download_shopping_cart(self, request, pk=None):
-        content = 'dsadsadasd'
-        response = HttpResponse(content, content_type='text/plain')
-        response['Content-Disposition'] = "attachment; filename='shopping_list.txt'"
+        user = self.request.user
+        recipes = IngredientReciepe.objects.filter(
+                recipe__shopping_cart__user=user
+                ).values_list('ingredient__name', 'ingredient__measurement_unit', 'amount')
+        shop = {}
+        result = ''
+        for ingredient, measurement_unit, amount in recipes:
+            if ingredient not in shop:
+                shop[ingredient] = {'measurement_unit': measurement_unit, 'amount': amount}
+            else:
+                shop[ingredient]['amount'] += amount
+        for ingr, res in shop.items():
+            result += f"{ingr.capitalize()} ({res['measurement_unit']}) - {res['amount']}\n"
+        response = HttpResponse(result, content_type='text/plain')
+        response['Content-Disposition'] = "attachment; filename='shoppinng_list.txt'"
         return response
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
     """Вьюсет для ингредиентов"""
+
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
+    filter_backends = [DjangoFilterBackend]
+    filtset_fields = ['name']

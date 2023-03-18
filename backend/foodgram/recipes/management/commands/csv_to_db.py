@@ -1,0 +1,21 @@
+from csv import DictReader
+
+from api.models import Ingredient
+from django.core.management.base import BaseCommand
+
+
+class Command(BaseCommand):
+    help = 'load data from csv'
+    
+    def handle(self, *args, **options):
+        model = Ingredient
+        if model.objects.exists():
+            print(
+                f'В {model.name} уже есть данные, отмена загрузки'
+            )
+        else:
+            with open('media/static/data/ingredients.csv', encoding='utf8', newline='') as csvfile:
+                csv_reader = DictReader(csvfile, delimiter=',')
+                for row in csv_reader:
+                    model.objects.create(**row)
+            print('Загрузка завершена')

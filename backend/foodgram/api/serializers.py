@@ -4,7 +4,8 @@ from django.core.files.base import ContentFile
 from rest_framework import serializers
 from users.serializers import UserGetSerializer
 
-from .models import Ingredient, IngredientReciepe, Recipe, Tag, Favorites, ShoppingCart
+from .models import (Favorites, Ingredient, IngredientReciepe, Recipe,
+                     ShoppingCart, Tag)
 
 
 class Base64ImageField(serializers.ImageField):
@@ -16,8 +17,9 @@ class Base64ImageField(serializers.ImageField):
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
         return super().to_internal_value(data)
 
-class TagSerializer(serializers.ModelSerializer):
 
+class TagSerializer(serializers.ModelSerializer):
+    """Сериалазер для тега"""
     class Meta:
         model = Tag
         fields = (
@@ -48,6 +50,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class IngredientRecipeSerializer(serializers.ModelSerializer):
     """Сериалайзер для получения ингридиентов в рецептах"""
+
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all(),
     )
@@ -177,6 +180,7 @@ class FavoriteInfoSerializer(serializers.ModelSerializer):
             'cooking_time',
         )
 
+
 class FavoriteSerializer(serializers.ModelSerializer):
     """Сериалайзер для добавления в избранное"""
 
@@ -190,6 +194,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         context = {'request': self.context.get('request')}
         return FavoriteInfoSerializer(instance.recipe, context=context).data
+
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
     """Сериалайзер для добавления рецептов в список покупок"""
