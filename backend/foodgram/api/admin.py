@@ -71,6 +71,7 @@ class ShoppingCartAdmin(admin.ModelAdmin):
         'recipe',
     )
 
+
 admin.site.register(Ingredient, IngridientAdmin)
 admin.site.register(ShoppingCart, ShoppingCartAdmin)
 admin.site.register(Recipe, RecipeAdmin)

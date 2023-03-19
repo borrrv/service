@@ -3,7 +3,6 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-
 SECRET_KEY = '2#2hku6sfntfr#r96z%m5@!zw)n@#y6ug&#2!asuxv)j1ztr)3'
 
 DEBUG = True
@@ -96,7 +95,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny', 
+        'rest_framework.permissions.AllowAny',
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [

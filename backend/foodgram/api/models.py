@@ -21,7 +21,7 @@ class Tag(models.Model):
     )
 
     class Meta:
-        verbose_name='Теги'
+        verbose_name = 'Теги'
 
     def __str__(self):
         return self.name
@@ -40,7 +40,7 @@ class Ingredient(models.Model):
     )
 
     class Meta:
-        verbose_name='Ингредиенты'
+        verbose_name = 'Ингредиенты'
 
     def __str__(self):
         return f'{self.name}, {self.measurement_unit}'
@@ -98,7 +98,7 @@ class Recipe(models.Model):
     )
 
     class Meta:
-        verbose_name='Рецепты'
+        verbose_name = 'Рецепты'
         ordering = ['-pub_date']
 
     def __str__(self):
@@ -122,7 +122,6 @@ class IngredientReciepe(models.Model):
         verbose_name='Количество',
     )
 
-
     class Meta:
         verbose_name = 'Ингредиенты в рецептах'
         constraints = [
@@ -134,7 +133,7 @@ class IngredientReciepe(models.Model):
 
     def __str__(self):
         return f'{self.ingredient}, {self.amount}'
-    
+
 
 class Favorites(models.Model):
     user = models.ForeignKey(
@@ -177,11 +176,10 @@ class ShoppingCart(models.Model):
 
     class Meta:
         ordering = ('id',)
-        verbose_name='Покупки'
+        verbose_name = 'Покупки'
         constraints = (
             models.UniqueConstraint(
                 fields=('user', 'recipe',),
                 name='unique_recipe_in_shoppingcart'
             ),
         )
-        

@@ -38,7 +38,7 @@ class UserViewSet(UserViewSet):
         if request.method == 'DELETE':
             if subscribed.exists():
                 subscribed.delete()
-                content = {'message':'Вы успешно отписались'}
+                content = {'message': 'Вы успешно отписались'}
                 return Response(content, status=HTTP_204_NO_CONTENT)
             content = {'errors': 'Вы не подписаны на этого автора'}
             return Response(content, status=HTTP_400_BAD_REQUEST)

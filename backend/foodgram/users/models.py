@@ -53,11 +53,11 @@ class User(AbstractUser):
     @property
     def is_guest(self):
         return self.role == self.GUEST
-    
+
     @property
     def is_user(self):
         return self.role == self.USER
-    
+
     @property
     def is_admin(self):
         return self.is_superuser or self.role == self.ADMIN
@@ -89,7 +89,7 @@ class Follow(models.Model):
                 name='unique_user_and_author'
             )
         ]
-        verbose_name='Подписки'
+        verbose_name = 'Подписки'
 
     def __str__(self):
         return f'{self.user} : {self.author}'
