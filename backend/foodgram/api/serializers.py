@@ -55,12 +55,14 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
         queryset=Ingredient.objects.all(),
     )
     name = serializers.CharField(
-            source='ingredient.name',
-            required=False,
-            read_only=True)
+        source='ingredient.name',
+        required=False,
+        read_only=True
+    )
     measurement_unit = serializers.CharField(
-            source='ingredient.measurement_unit',
-            read_only=True)
+        source='ingredient.measurement_unit',
+        read_only=True
+    )
     amount = serializers.CharField()
 
     class Meta:
@@ -89,8 +91,9 @@ class RecipesSerializer(serializers.ModelSerializer):
 
     tags = TagSerializer(many=True)
     ingredients = IngredientRecipeSerializer(
-            source='recipe_ingredient',
-            many=True)
+        source='recipe_ingredient',
+        many=True
+    )
     author = UserGetSerializer(read_only=True)
     is_favorite = serializers.SerializerMethodField(read_only=True)
     is_shopping_cart = serializers.SerializerMethodField(read_only=True)

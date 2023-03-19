@@ -63,7 +63,8 @@ class RecipesViewSet(viewsets.ModelViewSet):
                 return Response(content,
                                 status=HTTP_400_BAD_REQUEST)
             serializer = FavoriteSerializer(
-                    data={'user': user.id, 'recipe': recipe.id})
+                data={'user': user.id, 'recipe': recipe.id}
+            )
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=HTTP_201_CREATED)
@@ -81,13 +82,15 @@ class RecipesViewSet(viewsets.ModelViewSet):
         user = self.request.user
         recipe = get_object_or_404(Recipe, pk=pk)
         shopping_cart = ShoppingCart.objects.filter(
-                user=user, recipe=recipe.id)
+            user=user, recipe=recipe.id
+        )
         if request.method == 'POST':
             if shopping_cart.exists():
                 content = {'errors': 'Данный рецепт уже есть в списке покупок'}
                 return Response(content, status=HTTP_400_BAD_REQUEST)
             serializer = ShoppingCartSerializer(
-                    data={'user': user.id, 'recipe': recipe.id})
+                data={'user': user.id, 'recipe': recipe.id}
+            )
             serializer.is_valid(raise_exception=True)
             serializer.save()
             content = {'message': 'Рецепт успешно добавлен в список покупок'}
@@ -106,10 +109,11 @@ class RecipesViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request, pk=None):
         user = self.request.user
         recipes = IngredientReciepe.objects.filter(
-                recipe__shopping_cart__user=user
-                ).values_list('ingredient__name',
-                              'ingredient__measurement_unit',
-                              'amount')
+            recipe__shopping_cart__user=user).values_list(
+            'ingredient__name',
+            'ingredient__measurement_unit',
+            'amount'
+        )
         shop = {}
         result = ''
         for ingredient, measurement_unit, amount in recipes:

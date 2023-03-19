@@ -11,12 +11,12 @@ class UserCreateSerializer(UserCreateSerializer):
     class Meta:
         model = User
         fields = (
-                'email',
-                'username',
-                'first_name',
-                'last_name',
-                'password',
-            )
+            'email',
+            'username',
+            'first_name',
+            'last_name',
+            'password',
+        )
 
 
 class UserGetSerializer(UserSerializer):
@@ -27,13 +27,13 @@ class UserGetSerializer(UserSerializer):
     class Meta:
         model = User
         fields = (
-                'email',
-                'id',
-                'username',
-                'first_name',
-                'last_name',
-                'is_subscribed',
-            )
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+        )
         read_only_fields = ('role',)
 
     def get_is_subscribed(self, object):
