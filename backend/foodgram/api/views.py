@@ -123,9 +123,12 @@ class RecipesViewSet(viewsets.ModelViewSet):
             else:
                 shop[ingredient]['amount'] += amount
         for ingr, res in shop.items():
-            result += (f"{ingr.capitalize()} ({res['measurement_unit']}) - {res['amount']}\n")
+            result += (f"{ingr.capitalize()}"
+                       f"({res['measurement_unit']}) - {res['amount']}\n")
         response = HttpResponse(result, content_type='text/plain')
-        response['Content-Disposition'] = "attachment; filename='shoppinng_list.txt'"
+        response['Content-Disposition'] = (
+            "attachment; filename='shoppinng_list.txt'"
+        )
         return response
 
 
