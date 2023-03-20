@@ -1,17 +1,16 @@
-from api.models import (Favorites, Ingredient, IngredientReciepe, Recipe,
-                        ShoppingCart, Tag)
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from recipes.models import (Favorites, Ingredient, IngredientReciepe, Recipe,
+                            ShoppingCart, Tag)
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_400_BAD_REQUEST)
 
-from .permissions import IsAuthorOrReadOnly
 from .serializers import (AddRecipesSerializer, FavoriteSerializer,
                           IngredientSerializer, ShoppingCartSerializer,
                           TagSerializer)
@@ -32,7 +31,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
     queryset = Recipe.objects.all()
     serializer_class = AddRecipesSerializer
-    permission_classes = (IsAuthorOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_backends = [SearchFilter]
     search_fields = ['author',
                      'tags',
@@ -41,7 +40,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.request.method in ['POST, DELETE, PATCH']:
-            self.permission_classes = [IsAuthenticated]
+            self.permission_classes = [IsAuthenticatedOrReadOnly]
         return super(RecipesViewSet, self).get_permissions()
 
     def perform_create(self, serializer):

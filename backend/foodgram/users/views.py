@@ -1,3 +1,4 @@
+from api.serializers import FollowSerializer, UserSerializer
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework import permissions
@@ -7,7 +8,6 @@ from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_400_BAD_REQUEST)
 
 from .models import Follow, User
-from .serializers import FollowSerializer, UserGetSerializer
 
 
 class UserViewSet(UserViewSet):
@@ -16,7 +16,7 @@ class UserViewSet(UserViewSet):
     И для работы пользователя
     """
     queryset = User.objects.all()
-    serializer_class = UserGetSerializer
+    serializer_class = UserSerializer
 
     @action(detail=True, methods=['DELETE', 'POST'])
     @permission_classes([permissions.IsAuthenticated])

@@ -12,7 +12,7 @@ class Tag(models.Model):
     )
     color = models.CharField(
         max_length=7,
-        validators=[RegexValidator(r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")],
+        validators=[RegexValidator(r"^#([A-Fa-f0-9]{3,6})$")],
     )
     slug = models.SlugField(
         unique=True,
@@ -87,7 +87,7 @@ class Recipe(models.Model):
         verbose_name='Список тегов',
         related_name='recipes',
     )
-    cooking_time = models.PositiveIntegerField(
+    cooking_time = models.PositiveSmallIntegerField(
         blank=False,
         help_text='Введите время приготовления(в минутах)',
         verbose_name='Время приготовления',
@@ -110,6 +110,7 @@ class IngredientReciepe(models.Model):
         Ingredient,
         on_delete=models.CASCADE,
         verbose_name='Ингредиент',
+        related_name='+',
     )
     recipe = models.ForeignKey(
         Recipe,
@@ -140,7 +141,7 @@ class Favorites(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name='Пользователь',
-        related_name='favorite',
+        related_name='+',
     )
     recipe = models.ForeignKey(
         Recipe,
@@ -165,7 +166,7 @@ class ShoppingCart(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name='Пользователь',
-        related_name='shopping_cart',
+        related_name='+',
     )
     recipe = models.ForeignKey(
         Recipe,

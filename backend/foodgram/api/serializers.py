@@ -1,21 +1,77 @@
-import base64
-
-from django.core.files.base import ContentFile
+from djoser.serializers import UserSerializer
+from drf_extra_fields.fields import Base64ImageField
+from recipes.models import (Favorites, Ingredient, IngredientReciepe, Recipe,
+                            ShoppingCart, Tag)
 from rest_framework import serializers
-from users.serializers import UserGetSerializer
-
-from .models import (Favorites, Ingredient, IngredientReciepe, Recipe,
-                     ShoppingCart, Tag)
+from users.models import User
 
 
-class Base64ImageField(serializers.ImageField):
-    """Кодирование изображения"""
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')
-            ext = format.split('/')[-1]
-            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-        return super().to_internal_value(data)
+class UserSerializer(UserSerializer):
+    """Сериалайзер для отображения информации о пользователе"""
+
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+        )
+
+    def get_is_subscribed(self, object):
+        """Подписан ли пользователь на автора"""
+        user = self.context.get('request').user
+        if not user.is_authenticated:
+            return False
+        return user.follower.filter(author=object).exists()
+
+
+class ShortFollowSerializer(serializers.ModelSerializer):
+    """Сериалайзер для короткого рецепта в подписках"""
+    class Meta:
+        model = Recipe
+        fields = (
+            'id',
+            'name',
+            'image',
+            'cooking_time',
+        )
+
+
+class FollowSerializer(UserSerializer):
+    """Сериалайзер для добавления, удаления и просмотра подписок"""
+
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
+    recipes = serializers.SerializerMethodField(read_only=True)
+    recipes_count = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes',
+            'recipes_count',
+        )
+
+    def get_recipes(self, object):
+        request = self.context.get('request')
+        recipes = object.recipes.all()
+        recipes_limit = request.query_params.get('recipes_limit')
+        if recipes_limit:
+            recipes = recipes[:int(recipes_limit)]
+        return ShortFollowSerializer(recipes, many=True).data
+
+    def get_recipes_count(self, object):
+        return object.recipes.count()
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -94,7 +150,7 @@ class RecipesSerializer(serializers.ModelSerializer):
         source='recipe_ingredient',
         many=True
     )
-    author = UserGetSerializer(read_only=True)
+    author = UserSerializer(read_only=True)
     is_favorite = serializers.SerializerMethodField(read_only=True)
     is_shopping_cart = serializers.SerializerMethodField(read_only=True)
 
@@ -124,8 +180,8 @@ class RecipesSerializer(serializers.ModelSerializer):
 
 class AddRecipesSerializer(serializers.ModelSerializer):
     """Сериалайзер для создания рецептов"""
-    author = UserGetSerializer(read_only=True)
-    image = Base64ImageField()
+    author = UserSerializer(read_only=True)
+    image = Base64ImageField(required=False)
     ingredients = IngredientAddRecipeSerializer(many=True)
 
     class Meta:
