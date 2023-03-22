@@ -1,5 +1,7 @@
-from django.core.validators import RegexValidator
+from django.conf import settings
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
+
 from users.models import User
 
 
@@ -8,16 +10,16 @@ class Tag(models.Model):
         unique=True,
         blank=False,
         help_text='Введи тег',
-        max_length=200,
+        max_length=settings.MAX_LENGTH_RECIPES,
     )
     color = models.CharField(
-        max_length=7,
+        max_length=settings.MAX_LENGTH_COLOR,
         validators=[RegexValidator(r"^#([A-Fa-f0-9]{3,6})$")],
     )
     slug = models.SlugField(
         unique=True,
         blank=False,
-        max_length=200,
+        max_length=settings.MAX_LENGTH_RECIPES,
     )
 
     class Meta:
@@ -30,13 +32,13 @@ class Tag(models.Model):
 class Ingredient(models.Model):
     name = models.CharField(
         blank=False,
-        max_length=50,
+        max_length=settings.MAX_LENGTH_RECIPES,
         help_text='Укажите название ингредиента',
     )
     measurement_unit = models.CharField(
         blank=False,
         help_text='Введите единицу измерения',
-        max_length=30,
+        max_length=settings.MAX_LENGTH_RECIPES,
     )
 
     class Meta:
@@ -58,7 +60,7 @@ class Recipe(models.Model):
     name = models.CharField(
         blank=False,
         help_text='Введите название рецепта',
-        max_length=30,
+        max_length=200,
         verbose_name='Название рецепта',
     )
     image = models.ImageField(
@@ -69,16 +71,8 @@ class Recipe(models.Model):
     text = models.CharField(
         blank=False,
         help_text='Придумайте описание',
-        max_length=100,
         verbose_name='Описание рецепта',
-    )
-    ingredients = models.ManyToManyField(
-        Ingredient,
-        blank=False,
-        help_text='Выберите ингредиенты',
-        verbose_name='Список ингредиентов',
-        related_name='recipe',
-        through='IngredientReciepe',
+        max_length=settings.MAX_LENGTH_TEXT,
     )
     tags = models.ManyToManyField(
         Tag,
@@ -91,6 +85,7 @@ class Recipe(models.Model):
         blank=False,
         help_text='Введите время приготовления(в минутах)',
         verbose_name='Время приготовления',
+        validators=[MinValueValidator(1)],
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -121,6 +116,7 @@ class IngredientReciepe(models.Model):
     amount = models.PositiveIntegerField(
         help_text='Введите количество продукта',
         verbose_name='Количество',
+        validators=[MinValueValidator(1)]
     )
 
     class Meta:

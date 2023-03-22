@@ -129,8 +129,16 @@ DJOSER = {
     },
     'PERMISSIONS': {
         'user_list': ['rest_framework.permissions.AllowAny'],
-        'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly']
+        'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
     }
 }
 
 MAX_LENGTH = 150
+
+MAX_LENGTH_EMAIL = 254
+
+MAX_LENGTH_RECIPES = 200
+
+MAX_LENGTH_COLOR = 7
+
+MAX_LENGTH_TEXT = 1000

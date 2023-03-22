@@ -1,12 +1,13 @@
 from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
+from rest_framework import serializers
+
 from recipes.models import (Favorites, Ingredient, IngredientReciepe, Recipe,
                             ShoppingCart, Tag)
-from rest_framework import serializers
 from users.models import User
 
 
-class UserSerializer(UserSerializer):
+class UserSerializer(serializers.ModelSerializer):
     """Сериалайзер для отображения информации о пользователе"""
 
     is_subscribed = serializers.SerializerMethodField(read_only=True)
@@ -68,7 +69,8 @@ class FollowSerializer(UserSerializer):
         recipes_limit = request.query_params.get('recipes_limit')
         if recipes_limit:
             recipes = recipes[:int(recipes_limit)]
-        return ShortFollowSerializer(recipes, many=True).data
+        if recipes_limit.is_numeric():
+            return ShortFollowSerializer(recipes, many=True).data
 
     def get_recipes_count(self, object):
         return object.recipes.count()
@@ -133,6 +135,7 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
 
 class IngredientAddRecipeSerializer(serializers.ModelSerializer):
     """Сериалайзер для добавления ингредиентов при создании рецептов"""
+
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all(),
         source='ingredient',)

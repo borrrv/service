@@ -1,8 +1,9 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
-from foodgram.settings import MAX_LENGTH
 
-from .validators import validate_username, validate_username_me
+from .validators import validate_username_me
 
 
 class User(AbstractUser):
@@ -14,31 +15,28 @@ class User(AbstractUser):
         'Электронная почта',
         unique=True,
         blank=False,
-        max_length=254,
+        max_length=settings.MAX_LENGTH_EMAIL,
         help_text='Введите вашу электронную почту',
     )
     username = models.CharField(
         'Логин',
         unique=True,
-        max_length=MAX_LENGTH,
+        max_length=settings.MAX_LENGTH,
         help_text='Введите уникальный логин',
-        validators=[validate_username_me, validate_username]
+        validators=[validate_username_me,
+                    UnicodeUsernameValidator]
     )
     first_name = models.CharField(
         'Имя',
-        max_length=MAX_LENGTH,
+        max_length=settings.MAX_LENGTH,
         blank=False,
         help_text='Введи вашем Имя',
     )
     last_name = models.CharField(
         'Фамилия',
-        max_length=MAX_LENGTH,
+        max_length=settings.MAX_LENGTH,
         blank=False,
         help_text='Введите вашу фамилию',
-    )
-    is_subscribed = models.BooleanField(
-        'Подписка',
-        default=False,
     )
 
     class Meta:
