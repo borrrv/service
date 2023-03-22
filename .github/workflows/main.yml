@@ -58,11 +58,11 @@ jobs:
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
           cd /home/${{ secrets.USER }}/${{ github.repository_name}}
-          sudo docker pull {{ secrets.USER }}/foodgram:v1
-          sudo docker pull {{ secrets.USER }}/foodgram_front:v1
           sudo docker-compose stop
           sudo docker-compose rm backend
           sudo docker-compose rm frontend
+          sudo docker pull {{ secrets.DOCKER_USERNAME }}/foodgram:v1
+          sudo docker pull {{ secrets.DOCKER_USERNAME }}/foodgram_front:v1
           touch .env
           echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
           echo DB_NAME=${{ secrets.DB_NAME }} >> .env
