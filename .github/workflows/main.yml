@@ -57,7 +57,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
-          cd /home/${{ secrets.DOCKER_USERNAME }}/${{ github.repository_name}}/infra
+          cd {{ secrets.DOCKER_USERNAME }}/${{ github.repository_name}}/$infra
           sudo docker-compose stop
           sudo docker-compose rm backend
           sudo docker-compose rm frontend
