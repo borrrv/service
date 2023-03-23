@@ -21,7 +21,7 @@ from .serializers import (AddRecipesSerializer, FavoriteSerializer,
                           UserSerializer)
 
 
-class UserViewSet(UserViewSet):
+class UsersViewSet(UserViewSet):
     """
     Вьюсет для добавления, удаления и просмотра подписок
     И для работы пользователя
