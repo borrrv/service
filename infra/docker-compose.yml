@@ -41,6 +41,9 @@ services:
       - media_value:/var/html/media
     depends_on:
       - backend
+      - frontend
+    env_file:
+      - ./.env
   
 volumes:
   static_value:
