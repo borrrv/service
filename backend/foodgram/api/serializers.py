@@ -67,10 +67,9 @@ class FollowSerializer(UserSerializer):
         request = self.context.get('request')
         recipes = object.recipes.all()
         recipes_limit = request.query_params.get('recipes_limit')
-        if recipes_limit:
-            recipes = recipes[:int(recipes_limit)]
         if recipes_limit.is_numeric():
-            return ShortFollowSerializer(recipes, many=True).data
+            recipes = recipes[:int(recipes_limit)]
+        return ShortFollowSerializer(recipes, many=True).data
 
     def get_recipes_count(self, object):
         return object.recipes.count()
@@ -150,8 +149,7 @@ class RecipesSerializer(serializers.ModelSerializer):
 
     tags = TagSerializer(many=True)
     ingredients = IngredientRecipeSerializer(
-        source='recipe_ingredient',
-        many=True
+        many=True,
     )
     author = UserSerializer(read_only=True)
     is_favorite = serializers.SerializerMethodField(read_only=True)
@@ -174,10 +172,14 @@ class RecipesSerializer(serializers.ModelSerializer):
 
     def get_is_favorite(self, object):
         user = self.context.get('request').user
+        if not user.is_authenticated:
+            return False
         return object.favorite.filter(user=user).exists()
 
     def get_is_shopping_cart(self, object):
         user = self.context.get('request').user
+        if not user.is_authenticated:
+            return False
         return object.shopping_cart.filter(user=user).exists()
 
 
