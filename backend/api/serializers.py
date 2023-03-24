@@ -6,7 +6,7 @@ from recipes.models import (Favorites, Ingredient, IngredientReciepe, Recipe,
 from users.models import User
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserNewSerializer(serializers.ModelSerializer):
     """Сериалайзер для отображения информации о пользователе"""
 
     is_subscribed = serializers.SerializerMethodField(read_only=True)
@@ -42,7 +42,7 @@ class ShortFollowSerializer(serializers.ModelSerializer):
         )
 
 
-class FollowSerializer(UserSerializer):
+class FollowSerializer(UserNewSerializer):
     """Сериалайзер для добавления, удаления и просмотра подписок"""
 
     is_subscribed = serializers.SerializerMethodField(read_only=True)
@@ -150,7 +150,7 @@ class RecipesSerializer(serializers.ModelSerializer):
     ingredients = IngredientRecipeSerializer(
         many=True,
     )
-    author = UserSerializer(read_only=True)
+    author = UserNewSerializer(read_only=True)
     is_favorite = serializers.SerializerMethodField(read_only=True)
     is_shopping_cart = serializers.SerializerMethodField(read_only=True)
 
@@ -184,7 +184,7 @@ class RecipesSerializer(serializers.ModelSerializer):
 
 class AddRecipesSerializer(serializers.ModelSerializer):
     """Сериалайзер для создания рецептов"""
-    author = UserSerializer(read_only=True)
+    author = UserNewSerializer(read_only=True)
     image = Base64ImageField(required=False)
     ingredients = IngredientAddRecipeSerializer(many=True)
 

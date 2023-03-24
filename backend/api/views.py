@@ -18,16 +18,16 @@ from .permissions import IsAuthorOrReadOnly
 from .serializers import (AddRecipesSerializer, FavoriteSerializer,
                           FollowSerializer, IngredientSerializer,
                           ShoppingCartSerializer, TagSerializer,
-                          UserSerializer)
+                          UserNewSerializer)
 
 
-class UsersViewSet(UserViewSet):
+class UsersNewViewSet(UserViewSet):
     """
     Вьюсет для добавления, удаления и просмотра подписок
     И для работы пользователя
     """
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserNewSerializer
 
     @action(detail=True, methods=['DELETE', 'POST'],
             permission_classes=(permissions.IsAuthenticated,))
