@@ -1,0 +1,8 @@
+SECRET_KEY="django-insecure-i&r)5!t_)lx)i6f(#vw(*y8_kjqg%ul@-trub_b400ao8uk4jq"
+DB_ENGINE=django.db.backends.postgresql_psycopg2
+DB_NAME=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+DB_HOST="db"
+DB_PORT=5432
+DEBUG=True

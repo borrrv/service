@@ -33,7 +33,7 @@ class UsersNewViewSet(UserViewSet):
             permission_classes=(permissions.IsAuthenticated,))
     def subscribe(self, request, pk=None):
         user = request.user
-        author = get_object_or_404(User, id=pk)
+        author = get_object_or_404(User, pk=pk)
         subscribed = Follow.objects.filter(user=user, author=author)
         if request.method == 'POST':
             if user == author:
