@@ -14,6 +14,8 @@ from recipes.models import (Favorites, Ingredient, IngredientReciepe, Recipe,
                             ShoppingCart, Tag)
 from users.models import Follow, User
 
+from .filters import RecipesFilter
+from .paginations import CustomPagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (AddRecipesSerializer, FavoriteSerializer,
                           FollowSerializer, IngredientSerializer,
@@ -28,12 +30,13 @@ class UsersNewViewSet(UserViewSet):
     """
     queryset = User.objects.all()
     serializer_class = UserNewSerializer
+    pagination_class = CustomPagination
 
     @action(detail=True, methods=['DELETE', 'POST'],
             permission_classes=(permissions.IsAuthenticated,))
-    def subscribe(self, request, pk=None):
+    def subscribe(self, request, id):
         user = request.user
-        author = get_object_or_404(User, pk=pk)
+        author = get_object_or_404(User, id=id)
         subscribed = Follow.objects.filter(user=user, author=author)
         if request.method == 'POST':
             if user == author:
@@ -60,7 +63,8 @@ class UsersNewViewSet(UserViewSet):
         follows = User.objects.filter(following__user=user)
         page = self.paginate_queryset(follows)
         serializer = FollowSerializer(
-            page, many=True,
+            page,
+            many=True,
             context={'request': request})
         return self.get_paginated_response(serializer.data)
 
@@ -70,8 +74,8 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
-    filter_backends = [SearchFilter]
-    search_fields = ['recipes__name']
+    filter_backends = (SearchFilter,)
+    search_fields = ('recipes__name',)
     permission_classes = (AllowAny,)
 
 
@@ -81,11 +85,9 @@ class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = AddRecipesSerializer
     permission_classes = (IsAuthorOrReadOnly,)
-    filter_backends = [SearchFilter]
-    search_fields = ['author',
-                     'tags',
-                     'favorite__recipe',
-                     'shopping_cart__recipe']
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipesFilter
+    pagination_class = CustomPagination
 
     def get_permissions(self):
         if self.request.method in ['POST, DELETE, PATCH']:
@@ -100,27 +102,28 @@ class RecipesViewSet(viewsets.ModelViewSet):
         super().destroy(request, *args, **kwargs)
         return Response(content, status=HTTP_204_NO_CONTENT)
 
-    @action(detail=True, methods=['POST', 'DELETE', 'GET'])
+    @action(detail=True, methods=['POST', 'DELETE'])
     def favorite_and_shopping_cart(self, pk,
                                    serializer_class, model_class):
         user = self.request.user
         recipe = get_object_or_404(Recipe, pk=pk)
-        method = model_class.objects.filter(user=user, recipe=recipe)
+        object = model_class.objects.filter(user=user, recipe=recipe)
         if self.request.method == 'POST':
-            if method.exists():
+            if object.exists():
                 return Response(status=HTTP_400_BAD_REQUEST)
             serializer = serializer_class(
-                data={'user': user.id, 'recipe': recipe.id}
+                data={'user': user.id, 'recipe': pk},
+                context={'request': self.request},
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=HTTP_201_CREATED)
 
         if self.request.method == 'DELETE':
-            if method.exists():
-                method.delete()
+            if object.exists():
+                object.delete()
                 content = {'message': 'Успешно удалено'}
-                return Response(content, status=HTTP_400_BAD_REQUEST)
+                return Response(content, status=HTTP_204_NO_CONTENT)
             content = {'error': 'Ошибка'}
             return Response(content, status=HTTP_400_BAD_REQUEST)
 
@@ -129,7 +132,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         return self.favorite_and_shopping_cart(pk, FavoriteSerializer,
                                                Favorites)
 
-    @action(detail=True, methods=['POST', 'GET', 'DELETE'])
+    @action(detail=True, methods=['POST', 'DELETE'])
     def shopping_cart(self, request, pk=None):
         return self.favorite_and_shopping_cart(pk, ShoppingCartSerializer,
                                                ShoppingCart)
@@ -167,5 +170,5 @@ class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
-    filter_backends = [DjangoFilterBackend]
-    filtset_fields = ['name']
+    filter_backends = (SearchFilter,)
+    search_fields = ('^name',)

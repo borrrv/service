@@ -12,7 +12,6 @@ SECRET_KEY = (os.getenv('SECRET_KEY'),
 DEBUG = os.getenv('DEBUG', default=True)
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default=['*'])
-# ALLOWED_HOSTS = ['*']
 
 
 INSTALLED_APPS = [
@@ -123,6 +122,8 @@ REST_FRAMEWORK = {
 
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 6,
+    'DEFAULT_FILTER_BACKENDS': 'rest_framework.filters.SearchFilter',
+    'SEARCH_PARAM': 'name',
 }
 
 AUTH_USER_MODEL = 'users.User'

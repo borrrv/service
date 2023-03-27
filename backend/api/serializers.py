@@ -1,5 +1,6 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
+from rest_framework.validators import ValidationError
 
 from recipes.models import (Favorites, Ingredient, IngredientReciepe, Recipe,
                             ShoppingCart, Tag)
@@ -66,8 +67,11 @@ class FollowSerializer(UserNewSerializer):
         request = self.context.get('request')
         recipes = object.recipes.all()
         recipes_limit = request.query_params.get('recipes_limit')
-        if recipes_limit.is_numeric():
-            recipes = recipes[:int(recipes_limit)]
+        if recipes_limit is not None:
+            try:
+                recipes = recipes[:int(recipes_limit)]
+            except ValueError:
+                raise ValidationError('Ожидается int')
         return ShortFollowSerializer(recipes, many=True).data
 
     def get_recipes_count(self, object):
@@ -151,8 +155,8 @@ class RecipesSerializer(serializers.ModelSerializer):
         many=True,
     )
     author = UserNewSerializer(read_only=True)
-    is_favorite = serializers.SerializerMethodField(read_only=True)
-    is_shopping_cart = serializers.SerializerMethodField(read_only=True)
+    is_favorited = serializers.SerializerMethodField(read_only=True)
+    is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Recipe
@@ -161,21 +165,21 @@ class RecipesSerializer(serializers.ModelSerializer):
             'tags',
             'author',
             'ingredients',
-            'is_favorite',
-            'is_shopping_cart',
+            'is_favorited',
+            'is_in_shopping_cart',
             'name',
             'image',
             'text',
             'cooking_time',
         )
 
-    def get_is_favorite(self, object):
+    def get_is_favorited(self, object):
         user = self.context.get('request').user
         if not user.is_authenticated:
             return False
         return object.favorite.filter(user=user).exists()
 
-    def get_is_shopping_cart(self, object):
+    def get_is_in_shopping_cart(self, object):
         user = self.context.get('request').user
         if not user.is_authenticated:
             return False

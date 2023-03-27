@@ -1,3 +1,4 @@
+![main](https://github.com/borrrv/foodgram_project_react/actions/workflows/main.yml/badge.svg)
 # Foodgram
 ## Readme дополню
 ## Запуск проекта
