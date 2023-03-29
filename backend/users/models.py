@@ -41,6 +41,7 @@ class User(AbstractUser):
 
     class Meta:
         verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
         ordering = ('id',)
 
     def __str__(self):
@@ -71,6 +72,7 @@ class Follow(models.Model):
             )
         ]
         verbose_name = 'Подписки'
+        verbose_name_plural = 'Подписки'
 
     def __str__(self):
         return f'{self.user} : {self.author}'

@@ -1,6 +1,6 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-from rest_framework.validators import ValidationError
+from rest_framework.validators import UniqueTogetherValidator, ValidationError
 
 from recipes.models import (Favorites, Ingredient, IngredientReciepe, Recipe,
                             ShoppingCart, Tag)
@@ -113,6 +113,7 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
 
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all(),
+        source='ingredient.id',
     )
     name = serializers.CharField(
         source='ingredient.name',
@@ -204,13 +205,30 @@ class AddRecipesSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time',
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Recipe.objects.all(),
+                fields=('name',),
+                message=('Рецепт с таким названием уже есть'),
+            )
+        ]
 
-    def create_ingredients(self, recipe, ingredients):
+    def validate_ingredients(self, value):
+        ingredient_list = [ingredient for ingredient, amount in value]
+        unique_ingredients = set(ingredient_list)
+        if len(unique_ingredients) != len(ingredient_list):
+            raise ValidationError(
+                'Ингредиенты не должны повторяться'
+            )
+        return value
+
+    def create_ingredients(self, instance, ingredients):
         for ingredient in ingredients:
             amount = ingredient['amount']
             ingredient_obj = ingredient['ingredient']
             IngredientReciepe.objects.create(
-                recipe=recipe, ingredient=ingredient_obj,
+                recipe=instance,
+                ingredient=ingredient_obj,
                 amount=amount,
             )
 
@@ -230,11 +248,12 @@ class AddRecipesSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        tags_data = validated_data.pop('tags')
-        ingredients_data = validated_data.pop('ingredients')
+        tags = instance.tags.clear()
         IngredientReciepe.objects.filter(recipe=instance).delete()
-        instance.tags.set(tags_data)
-        self.create_ingredients(instance, ingredients_data)
+        tags = validated_data.pop('tags')
+        instance.tags.set(tags)
+        ingredients = validated_data.pop('ingredients')
+        self.create_ingredients(instance, ingredients)
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):

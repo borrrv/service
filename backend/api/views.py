@@ -31,6 +31,7 @@ class UsersNewViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = UserNewSerializer
     pagination_class = CustomPagination
+    filter_backends = (DjangoFilterBackend,)
 
     @action(detail=True, methods=['DELETE', 'POST'],
             permission_classes=(permissions.IsAuthenticated,))
