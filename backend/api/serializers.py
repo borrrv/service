@@ -214,7 +214,9 @@ class AddRecipesSerializer(serializers.ModelSerializer):
         ]
 
     def validate_ingredients(self, value):
-        ingredient_list = [ingredient for ingredient, amount in value]
+        ingredient_list = [
+            ingredient.get('ingredient').id for ingredient in value
+        ]
         unique_ingredients = set(ingredient_list)
         if len(unique_ingredients) != len(ingredient_list):
             raise ValidationError(
